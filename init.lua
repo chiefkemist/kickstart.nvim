@@ -1,4 +1,4 @@
---[[
+--[[compiler
 
 =====================================================================
 ==================== READ THIS BEFORE CONTINUING ====================
@@ -441,6 +441,10 @@ require('lazy').setup({
       --    That is to say, every time a new file is opened that is associated with
       --    an lsp (for example, opening `main.rs` is associated with `rust_analyzer`) this
       --    function will be executed to configure the current buffer
+      --
+      local lspconfig = require 'lspconfig'
+      lspconfig.sourcekit.setup {} -- For Swift
+
       vim.api.nvim_create_autocmd('LspAttach', {
         group = vim.api.nvim_create_augroup('kickstart-lsp-attach', { clear = true }),
         callback = function(event)
@@ -533,9 +537,12 @@ require('lazy').setup({
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
         clangd = {},
+        clojure_lsp = {},
         gopls = {},
         pyright = {},
+        ruby_lsp = {},
         rust_analyzer = {},
+        zls = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
         -- Some languages (like typescript) have entire language plugins that can be useful:
