@@ -32,6 +32,9 @@ return {
       },
     },
     {
+      'kovisoft/slimv', -- Lisp
+    },
+    {
       'liquidz/vim-iced', -- Clojure
       dependencies = {
         'guns/vim-sexp',
