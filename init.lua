@@ -84,6 +84,38 @@ I hope you enjoy your Neovim journey,
 P.S. You can delete this when you're done too. It's your config now! :)
 --]]
 
+-- [[ Fix PATH for GUI apps (NeoVide) on macOS ]]
+-- NeoVide doesn't inherit shell PATH, so we need to add goenv/pyenv/rbenv paths manually
+local home = vim.env.HOME
+if home then
+  -- Add goenv
+  local goenv_root = home .. '/.goenv'
+  local goenv_bin = goenv_root .. '/bin'
+  local goenv_shims = goenv_root .. '/shims'
+  
+  -- Check if goenv exists and add to PATH
+  if vim.fn.isdirectory(goenv_root) == 1 then
+    vim.env.GOENV_ROOT = goenv_root
+    vim.env.PATH = goenv_bin .. ':' .. goenv_shims .. ':' .. vim.env.PATH
+  end
+  
+  -- Add pyenv if needed
+  local pyenv_root = home .. '/.pyenv'
+  local pyenv_shims = pyenv_root .. '/shims'
+  if vim.fn.isdirectory(pyenv_root) == 1 then
+    vim.env.PYENV_ROOT = pyenv_root
+    vim.env.PATH = pyenv_shims .. ':' .. vim.env.PATH
+  end
+  
+  -- Add rbenv if needed  
+  local rbenv_root = home .. '/.rbenv'
+  local rbenv_shims = rbenv_root .. '/shims'
+  if vim.fn.isdirectory(rbenv_root) == 1 then
+    vim.env.RBENV_ROOT = rbenv_root
+    vim.env.PATH = rbenv_shims .. ':' .. vim.env.PATH
+  end
+end
+
 -- Set <space> as the leader key
 -- See `:help mapleader`
 --  NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
@@ -277,12 +309,12 @@ require('lazy').setup({
       require('which-key').setup()
 
       -- Document existing key chains
-      require('which-key').register {
-        ['<leader>c'] = { name = '[C]ode', _ = 'which_key_ignore' },
-        ['<leader>d'] = { name = '[D]ocument', _ = 'which_key_ignore' },
-        ['<leader>r'] = { name = '[R]ename', _ = 'which_key_ignore' },
-        ['<leader>s'] = { name = '[S]earch', _ = 'which_key_ignore' },
-        ['<leader>w'] = { name = '[W]orkspace', _ = 'which_key_ignore' },
+      require('which-key').add {
+        { '<leader>c', group = '[C]ode' },
+        { '<leader>d', group = '[D]ocument' },
+        { '<leader>r', group = '[R]ename' },
+        { '<leader>s', group = '[S]earch' },
+        { '<leader>w', group = '[W]orkspace' },
       }
     end,
   },
@@ -442,9 +474,6 @@ require('lazy').setup({
       --    an lsp (for example, opening `main.rs` is associated with `rust_analyzer`) this
       --    function will be executed to configure the current buffer
       --
-      local lspconfig = require 'lspconfig'
-      lspconfig.sourcekit.setup {} -- For Swift
-
       vim.api.nvim_create_autocmd('LspAttach', {
         group = vim.api.nvim_create_augroup('kickstart-lsp-attach', { clear = true }),
         callback = function(event)
@@ -537,8 +566,17 @@ require('lazy').setup({
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
         clangd = {},
-        clojure_lsp = {},
+        clojure_lsp = {
+          settings = {
+            ['clojure-lsp'] = {
+              ['semantic-tokens?'] = true,
+              ['code-lens-segregate-test-references'] = true,
+            },
+          },
+        },
         gopls = {},
+        -- Note: sourcekit is NOT in this list because Mason cannot install it.
+        -- It's configured separately below after Mason setup.
         pyright = {},
         ruby_lsp = {},
         rust_analyzer = {},
@@ -548,8 +586,8 @@ require('lazy').setup({
         -- Some languages (like typescript) have entire language plugins that can be useful:
         --    https://github.com/pmizio/typescript-tools.nvim
         --
-        -- But for many setups, the LSP (`tsserver`) will work just fine
-        tsserver = {},
+        -- But for many setups, the LSP (`ts_ls`) will work just fine
+        ts_ls = {},  -- TypeScript/JavaScript language server
         --
 
         lua_ls = {
@@ -608,6 +646,25 @@ require('lazy').setup({
           end,
         },
       }
+
+      -- Configure SourceKit-LSP separately (not available in Mason)
+      -- SourceKit-LSP comes with Xcode or Swift toolchain
+      -- Using modern vim.lsp.config API (Neovim 0.11+)
+      if vim.fn.executable('sourcekit-lsp') == 1 then
+        vim.lsp.config('sourcekit', {
+          cmd = { 'sourcekit-lsp' },
+          filetypes = { 'swift', 'objc', 'objcpp' },
+          root_markers = { 'Package.swift', '.git' },
+          capabilities = vim.tbl_deep_extend('force', capabilities, {
+            workspace = {
+              didChangeWatchedFiles = {
+                dynamicRegistration = true,
+              },
+            },
+          }),
+        })
+        vim.lsp.enable('sourcekit')
+      end
     end,
   },
 
@@ -794,9 +851,11 @@ require('lazy').setup({
 
       ---@diagnostic disable-next-line: missing-fields
       require('nvim-treesitter.configs').setup {
-        ensure_installed = { 'bash', 'c', 'html', 'lua', 'markdown', 'vim', 'vimdoc' },
+        ensure_installed = { 'bash', 'c', 'clojure', 'html', 'lua', 'markdown', 'vim', 'vimdoc' },
         -- Autoinstall languages that are not installed
         auto_install = true,
+        -- Ignore org parser since orgmode plugin provides its own
+        ignore_install = { 'org' },
         highlight = { enable = true },
         indent = { enable = true },
       }
@@ -830,7 +889,7 @@ require('lazy').setup({
   --
   --  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
   --    For additional information, see `:help lazy.nvim-lazy.nvim-structuring-your-plugins`
-  -- { import = 'custom.plugins' },
+  { import = 'custom.plugins' },
 }, {
   ui = {
     -- If you have a Nerd Font, set icons to an empty table which will use the

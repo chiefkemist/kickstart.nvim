@@ -47,8 +47,17 @@ return {
     },
     {
       'fatih/vim-go', -- Go
+      ft = { 'go' }, -- Only load for Go files
       init = function()
-        vim.g.go_auto_type_info = 1
+        -- Disable features that conflict with gopls LSP
+        vim.g.go_def_mapping_enabled = 0 -- Use gopls for go-to-definition
+        vim.g.go_code_completion_enabled = 0 -- Use gopls for completion
+        vim.g.go_auto_type_info = 0 -- Use gopls for type info
+        vim.g.go_doc_keywordprg_enabled = 0 -- Use gopls for K documentation
+        
+        -- Keep useful vim-go commands like :GoBuild, :GoTest, :GoRun
+        vim.g.go_fmt_autosave = 1 -- Auto-format on save
+        vim.g.go_imports_autosave = 1 -- Auto-import on save
       end,
     },
     {
