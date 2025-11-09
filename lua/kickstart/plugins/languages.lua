@@ -54,7 +54,7 @@ return {
         vim.g.go_code_completion_enabled = 0 -- Use gopls for completion
         vim.g.go_auto_type_info = 0 -- Use gopls for type info
         vim.g.go_doc_keywordprg_enabled = 0 -- Use gopls for K documentation
-        
+
         -- Keep useful vim-go commands like :GoBuild, :GoTest, :GoRun
         vim.g.go_fmt_autosave = 1 -- Auto-format on save
         vim.g.go_imports_autosave = 1 -- Auto-import on save
@@ -90,9 +90,6 @@ return {
           },
         }
       end,
-    },
-    {
-      'OmniSharp/omnisharp-vim', -- CSharp
     },
     -- DataScience / Machine Learning / DeepLearning
     {

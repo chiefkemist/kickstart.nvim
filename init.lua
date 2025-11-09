@@ -624,7 +624,12 @@ require('lazy').setup({
       --    :Mason
       --
       --  You can press `g?` for help in this menu
-      require('mason').setup()
+      require('mason').setup({
+        registries = {
+          'github:mason-org/mason-registry',
+          'github:Crashdummyy/mason-registry', -- For roslyn LSP
+        },
+      })
 
       -- You can add other tools here that you want Mason to install
       -- for you, so that they are available from within Neovim.
@@ -637,6 +642,11 @@ require('lazy').setup({
       require('mason-lspconfig').setup {
         handlers = {
           function(server_name)
+            -- Skip csharp_ls and omnisharp since we use roslyn.nvim instead
+            if server_name == 'csharp_ls' or server_name == 'omnisharp' then
+              return
+            end
+            
             local server = servers[server_name] or {}
             -- This handles overriding only values explicitly passed
             -- by the server configuration above. Useful when disabling
@@ -646,6 +656,20 @@ require('lazy').setup({
           end,
         },
       }
+
+      -- Disable csharp_ls and omnisharp (we use roslyn.nvim instead)
+      -- This prevents Mason-installed servers from auto-starting
+      vim.api.nvim_create_autocmd('FileType', {
+        pattern = 'cs',
+        callback = function()
+          -- Stop any csharp_ls or omnisharp clients that may have started
+          for _, client in ipairs(vim.lsp.get_clients()) do
+            if client.name == 'csharp_ls' or client.name == 'omnisharp' then
+              vim.lsp.stop_client(client.id)
+            end
+          end
+        end,
+      })
 
       -- Configure SourceKit-LSP separately (not available in Mason)
       -- SourceKit-LSP comes with Xcode or Swift toolchain
@@ -882,6 +906,7 @@ require('lazy').setup({
    require 'kickstart.plugins.indent_line',
    require 'kickstart.plugins.extracolors',
    require 'kickstart.plugins.languages',
+   require 'kickstart.plugins.csharp',
    require 'kickstart.plugins.extrautilities',
    require 'kickstart.plugins.opencode',
 
