@@ -92,13 +92,13 @@ if home then
   local goenv_root = home .. '/.goenv'
   local goenv_bin = goenv_root .. '/bin'
   local goenv_shims = goenv_root .. '/shims'
-  
+
   -- Check if goenv exists and add to PATH
   if vim.fn.isdirectory(goenv_root) == 1 then
     vim.env.GOENV_ROOT = goenv_root
     vim.env.PATH = goenv_bin .. ':' .. goenv_shims .. ':' .. vim.env.PATH
   end
-  
+
   -- Add pyenv if needed
   local pyenv_root = home .. '/.pyenv'
   local pyenv_shims = pyenv_root .. '/shims'
@@ -106,8 +106,8 @@ if home then
     vim.env.PYENV_ROOT = pyenv_root
     vim.env.PATH = pyenv_shims .. ':' .. vim.env.PATH
   end
-  
-  -- Add rbenv if needed  
+
+  -- Add rbenv if needed
   local rbenv_root = home .. '/.rbenv'
   local rbenv_shims = rbenv_root .. '/shims'
   if vim.fn.isdirectory(rbenv_root) == 1 then
@@ -575,6 +575,7 @@ require('lazy').setup({
           },
         },
         gopls = {},
+        kotlin_lsp = {},
         -- Note: sourcekit is NOT in this list because Mason cannot install it.
         -- It's configured separately below after Mason setup.
         pyright = {},
@@ -587,7 +588,7 @@ require('lazy').setup({
         --    https://github.com/pmizio/typescript-tools.nvim
         --
         -- But for many setups, the LSP (`ts_ls`) will work just fine
-        ts_ls = {},  -- TypeScript/JavaScript language server
+        ts_ls = {}, -- TypeScript/JavaScript language server
         --
 
         lua_ls = {
@@ -624,12 +625,12 @@ require('lazy').setup({
       --    :Mason
       --
       --  You can press `g?` for help in this menu
-      require('mason').setup({
+      require('mason').setup {
         registries = {
           'github:mason-org/mason-registry',
           'github:Crashdummyy/mason-registry', -- For roslyn LSP
         },
-      })
+      }
 
       -- You can add other tools here that you want Mason to install
       -- for you, so that they are available from within Neovim.
@@ -646,7 +647,7 @@ require('lazy').setup({
             if server_name == 'csharp_ls' or server_name == 'omnisharp' then
               return
             end
-            
+
             local server = servers[server_name] or {}
             -- This handles overriding only values explicitly passed
             -- by the server configuration above. Useful when disabling
@@ -674,7 +675,7 @@ require('lazy').setup({
       -- Configure SourceKit-LSP separately (not available in Mason)
       -- SourceKit-LSP comes with Xcode or Swift toolchain
       -- Using modern vim.lsp.config API (Neovim 0.11+)
-      if vim.fn.executable('sourcekit-lsp') == 1 then
+      if vim.fn.executable 'sourcekit-lsp' == 1 then
         vim.lsp.config('sourcekit', {
           cmd = { 'sourcekit-lsp' },
           filetypes = { 'swift', 'objc', 'objcpp' },
@@ -687,7 +688,7 @@ require('lazy').setup({
             },
           }),
         })
-        vim.lsp.enable('sourcekit')
+        vim.lsp.enable 'sourcekit'
       end
     end,
   },
@@ -902,15 +903,12 @@ require('lazy').setup({
   --  Here are some example plugins that I've included in the kickstart repository.
   --  Uncomment any of the lines below to enable them (you will need to restart nvim).
   --
-   require 'kickstart.plugins.debug',
-   require 'kickstart.plugins.indent_line',
-   require 'kickstart.plugins.extracolors',
-   require 'kickstart.plugins.languages',
-   require 'kickstart.plugins.csharp',
-   require 'kickstart.plugins.extrautilities',
-   require 'kickstart.plugins.opencode',
-
-
+  require 'kickstart.plugins.debug',
+  require 'kickstart.plugins.indent_line',
+  require 'kickstart.plugins.extracolors',
+  require 'kickstart.plugins.languages',
+  require 'kickstart.plugins.extrautilities',
+  require 'kickstart.plugins.opencode',
 
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
   --    This is the easiest way to modularize your config.
