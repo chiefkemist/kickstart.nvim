@@ -581,6 +581,7 @@ require('lazy').setup({
         pyright = {},
         ruby_lsp = {},
         rust_analyzer = {},
+        templ = {},
         zls = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
