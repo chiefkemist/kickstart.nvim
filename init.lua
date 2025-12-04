@@ -574,6 +574,7 @@ require('lazy').setup({
             },
           },
         },
+        cue = {},
         gopls = {},
         kotlin_lsp = {},
         -- Note: sourcekit is NOT in this list because Mason cannot install it.
