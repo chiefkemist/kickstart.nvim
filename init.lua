@@ -565,6 +565,7 @@ require('lazy').setup({
       --  - settings (table): Override the default settings passed when initializing the server.
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
+        -- https://github.com/neovim/nvim-lspconfig/blob/master/doc/configs.md
         clangd = {},
         clojure_lsp = {
           settings = {
@@ -583,7 +584,6 @@ require('lazy').setup({
         ruby_lsp = {},
         rust_analyzer = {},
         templ = {},
-        zls = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
         -- Some languages (like typescript) have entire language plugins that can be useful:
@@ -691,6 +691,50 @@ require('lazy').setup({
           }),
         })
         vim.lsp.enable 'sourcekit'
+      end
+
+      -- Cpmfigure ZLS separately (installed via system package manager)
+      -- https://zigtools.org/zls/editors/vim/nvim-lspconfig/
+      if vim.fn.executable 'zls' == 1 then
+        vim.lsp.config('zls', {
+          cmd = { 'zls' },
+          filetypes = { 'zig', 'zir', 'zon' },
+          settings = {
+            -- Neovim already provides basic syntax highlighting
+            semantic_tokens = 'partial',
+          },
+        })
+        vim.lsp.enable 'zls'
+      end
+
+      -- Configure OCaml LSP separately (installed via dune tools)
+      -- Dynamically finds project-local ocamllsp via dune
+      local function find_ocamllsp_cmd()
+        local cwd = vim.fn.getcwd()
+        if vim.fn.filereadable(cwd .. '/dune-project') == 1 then
+          local result = vim.fn.system('cd ' .. vim.fn.shellescape(cwd) .. ' && dune tools which ocamllsp 2>/dev/null')
+          if vim.v.shell_error == 0 and result ~= '' then
+            local path = vim.trim(result)
+            if not path:match '^/' then
+              path = cwd .. '/' .. path
+            end
+            return { path }
+          end
+        end
+        if vim.fn.executable 'ocamllsp' == 1 then
+          return { 'ocamllsp' }
+        end
+        return nil
+      end
+
+      local ocamllsp_cmd = find_ocamllsp_cmd()
+      if ocamllsp_cmd then
+        require('lspconfig').ocamllsp.setup {
+          cmd = ocamllsp_cmd,
+          filetypes = { 'ocaml', 'menhir', 'ocamlinterface', 'ocamllex', 'reason', 'dune' },
+          root_dir = require('lspconfig.util').root_pattern('dune-project', 'dune-workspace', '*.opam', 'opam', 'esy.json', 'package.json', '.git'),
+          capabilities = capabilities,
+        }
       end
     end,
   },

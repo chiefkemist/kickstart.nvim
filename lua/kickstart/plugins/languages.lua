@@ -64,8 +64,15 @@ return {
       'jjo/vim-cue', -- Cue
     },
     {
-      'ziglang/zig.vim', -- Zig
+      'tarides/ocaml.nvim', -- OCaml helper commands (LSP configured in init.lua)
+      ft = { 'ocaml', 'menhir', 'ocamlinterface', 'ocamllex', 'reason', 'dune' },
+      config = function()
+        require('ocaml').setup()
+      end,
     },
+    -- {
+    --   'ziglang/zig.vim', -- Zig
+    -- },
     {
       'mrcjkb/rustaceanvim', -- Rust
       version = '^4',
