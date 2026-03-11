@@ -1,0 +1,56 @@
+*custom-nim.txt*  Nim tooling for this Neovim config
+
+Nim Commands                                           *custom-nim-commands*
+
+These commands are provided by `lua/custom/plugins/nim.lua`.
+
+The optional backend argument supports:
+  `c`, `cpp`, `objc`, `js`
+
+If a `.nimble` file is found upward from the current buffer, project commands
+prefer `nimble`. Otherwise they fall back to standalone `nim` file commands.
+
+:NimBuild [backend]                                  *:NimBuild*
+        Build the current Nim project or standalone file.
+        Project: `nimble build --backend:<backend>`
+        Standalone: `nim <backend> <current-file>`
+
+:NimRun [backend]                                    *:NimRun*
+        Run the current Nim project or standalone file.
+        Project: `nimble run --backend:<backend>`
+        Standalone: `nim <backend> -r <current-file>`
+
+:NimCheck [backend]                                  *:NimCheck*
+        Run `nim check` on the current file.
+
+:NimTest [backend]                                   *:NimTest*
+        Run tests for the current Nimble project.
+        Standalone files are not supported.
+
+:NimbleBuild [backend]                               *:NimbleBuild*
+        Run `nimble build` for the current project.
+
+:NimbleRun [backend]                                 *:NimbleRun*
+        Run `nimble run` for the current project.
+
+:NimbleTest [backend]                                *:NimbleTest*
+        Run `nimble test` for the current project.
+
+:NimbleInstall [backend]                             *:NimbleInstall*
+        Run `nimble install` for the current project.
+
+Examples                                             *custom-nim-examples*
+
+        :NimBuild
+        :NimBuild cpp
+        :NimRun js
+        :NimCheck objc
+
+Keymaps                                              *custom-nim-keymaps*
+
+These are buffer-local and only apply to Nim buffers.
+
+        <leader>nb    Build
+        <leader>nr    Run
+        <leader>nc    Check
+        <leader>nt    Test

@@ -42,9 +42,9 @@ return {
         'liuchengxu/vim-clap',
       },
     },
-    {
-      'alaviss/nim.nvim', -- Nim
-    },
+    -- {
+    --   'alaviss/nim.nvim', -- Nim -- No longer needed, rely on Treesitter instead
+    -- },
     {
       'fatih/vim-go', -- Go
       ft = { 'go' }, -- Only load for Go files

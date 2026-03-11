@@ -580,6 +580,7 @@ require('lazy').setup({
         kotlin_lsp = {},
         -- Note: sourcekit is NOT in this list because Mason cannot install it.
         -- It's configured separately below after Mason setup.
+        nim_langserver = {},
         pyright = {},
         ruby_lsp = {},
         rust_analyzer = {},
@@ -645,8 +646,10 @@ require('lazy').setup({
       require('mason-lspconfig').setup {
         handlers = {
           function(server_name)
-            -- Skip csharp_ls and omnisharp since we use roslyn.nvim instead
-            if server_name == 'csharp_ls' or server_name == 'omnisharp' then
+            -- Skip csharp_ls and omnisharp since we use roslyn.nvim instead.
+            -- Skip nim_langserver too; it is configured separately below so we can
+            -- control its PATH and nimsuggest lookup explicitly.
+            if server_name == 'csharp_ls' or server_name == 'omnisharp' or server_name == 'nim_langserver' then
               return
             end
 
@@ -692,6 +695,8 @@ require('lazy').setup({
         })
         vim.lsp.enable 'sourcekit'
       end
+
+      -- Nim is configured via the custom plugin import in `lua/custom/plugins/nim.lua`.
 
       -- Cpmfigure ZLS separately (installed via system package manager)
       -- https://zigtools.org/zls/editors/vim/nvim-lspconfig/

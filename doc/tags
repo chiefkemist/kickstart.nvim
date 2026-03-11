@@ -1,3 +1,15 @@
+:NimBuild	custom-nim.txt	/*:NimBuild*
+:NimCheck	custom-nim.txt	/*:NimCheck*
+:NimRun	custom-nim.txt	/*:NimRun*
+:NimTest	custom-nim.txt	/*:NimTest*
+:NimbleBuild	custom-nim.txt	/*:NimbleBuild*
+:NimbleInstall	custom-nim.txt	/*:NimbleInstall*
+:NimbleRun	custom-nim.txt	/*:NimbleRun*
+:NimbleTest	custom-nim.txt	/*:NimbleTest*
+custom-nim-commands	custom-nim.txt	/*custom-nim-commands*
+custom-nim-examples	custom-nim.txt	/*custom-nim-examples*
+custom-nim-keymaps	custom-nim.txt	/*custom-nim-keymaps*
+custom-nim.txt	custom-nim.txt	/*custom-nim.txt*
 kickstart-is	kickstart.txt	/*kickstart-is*
 kickstart-is-not	kickstart.txt	/*kickstart-is-not*
 kickstart.nvim	kickstart.txt	/*kickstart.nvim*
