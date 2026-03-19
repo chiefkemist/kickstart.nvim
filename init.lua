@@ -84,37 +84,8 @@ I hope you enjoy your Neovim journey,
 P.S. You can delete this when you're done too. It's your config now! :)
 --]]
 
--- [[ Fix PATH for GUI apps (NeoVide) on macOS ]]
--- NeoVide doesn't inherit shell PATH, so we need to add goenv/pyenv/rbenv paths manually
-local home = vim.env.HOME
-if home then
-  -- Add goenv
-  local goenv_root = home .. '/.goenv'
-  local goenv_bin = goenv_root .. '/bin'
-  local goenv_shims = goenv_root .. '/shims'
-
-  -- Check if goenv exists and add to PATH
-  if vim.fn.isdirectory(goenv_root) == 1 then
-    vim.env.GOENV_ROOT = goenv_root
-    vim.env.PATH = goenv_bin .. ':' .. goenv_shims .. ':' .. vim.env.PATH
-  end
-
-  -- Add pyenv if needed
-  local pyenv_root = home .. '/.pyenv'
-  local pyenv_shims = pyenv_root .. '/shims'
-  if vim.fn.isdirectory(pyenv_root) == 1 then
-    vim.env.PYENV_ROOT = pyenv_root
-    vim.env.PATH = pyenv_shims .. ':' .. vim.env.PATH
-  end
-
-  -- Add rbenv if needed
-  local rbenv_root = home .. '/.rbenv'
-  local rbenv_shims = rbenv_root .. '/shims'
-  if vim.fn.isdirectory(rbenv_root) == 1 then
-    vim.env.RBENV_ROOT = rbenv_root
-    vim.env.PATH = rbenv_shims .. ':' .. vim.env.PATH
-  end
-end
+-- [[ Early bootstrap ]]
+require('custom.bootstrap').setup()
 
 -- Set <space> as the leader key
 -- See `:help mapleader`
@@ -698,15 +669,20 @@ require('lazy').setup({
 
       -- Nim is configured via the custom plugin import in `lua/custom/plugins/nim.lua`.
 
-      -- Cpmfigure ZLS separately (installed via system package manager)
+      -- Configure ZLS separately (installed via system package manager).
       -- https://zigtools.org/zls/editors/vim/nvim-lspconfig/
       if vim.fn.executable 'zls' == 1 then
         vim.lsp.config('zls', {
-          cmd = { 'zls' },
+          cmd = { vim.fn.exepath 'zls' },
+          capabilities = capabilities,
           filetypes = { 'zig', 'zir', 'zon' },
+          root_markers = { 'zls.json', 'build.zig', 'build.zig.zon', '.git' },
           settings = {
-            -- Neovim already provides basic syntax highlighting
+            -- Neovim already provides basic syntax highlighting.
             semantic_tokens = 'partial',
+            -- Some of your Zig projects currently have broken/outdated build files,
+            -- which causes ZLS build-runner failures and makes the experience noisy.
+            enable_build_on_save = false,
           },
         })
         vim.lsp.enable 'zls'

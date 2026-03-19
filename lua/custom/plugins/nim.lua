@@ -642,6 +642,9 @@ end
 return {
   {
     'neovim/nvim-lspconfig',
-    config = setup_nim,
+    opts = function(_, opts)
+      setup_nim()
+      return opts
+    end,
   },
 }

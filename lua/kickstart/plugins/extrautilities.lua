@@ -1,13 +1,9 @@
 return {
-  {
-    'github/copilot.vim', -- AI Copilot
-  },
+  -- {
+  --   'github/copilot.vim', -- AI Copilot
+  -- },
   {
     'scrooloose/nerdtree', -- NERDTree
-  },
-  {
-    'NoahTheDuke/vim-just',
-    ft = { 'just' },
   },
   {
     'nvim-orgmode/orgmode',
