@@ -9,13 +9,18 @@ return {
   {
     'neovim/nvim-lspconfig',
     optional = true,
-    opts = {
-      servers = {
-        html = {
-          filetypes = { 'html', 'razor', 'cshtml' },
-        },
-      },
-    },
+    opts = function(_, opts)
+      opts.servers = opts.servers or {}
+      opts.servers.html = vim.tbl_deep_extend('force', opts.servers.html or {}, {
+        filetypes = { 'html', 'razor', 'cshtml' },
+      })
+
+      vim.lsp.config('html', vim.tbl_deep_extend('force', vim.deepcopy(vim.lsp.config.html or {}), {
+        filetypes = { 'html', 'razor', 'cshtml' },
+      }))
+
+      return opts
+    end,
   },
 
   -- CSharpier formatter

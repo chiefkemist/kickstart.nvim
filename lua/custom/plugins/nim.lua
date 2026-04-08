@@ -110,13 +110,26 @@ local function setup_nim_server(paths)
     return
   end
 
+  local function start_nimlangserver(dispatchers)
+    local wrapped_dispatchers = vim.tbl_extend('force', {}, dispatchers, {
+      on_exit = function(code, signal)
+        if code == 0 and signal == 11 then
+          return dispatchers.on_exit(0, 15)
+        end
+        return dispatchers.on_exit(code, signal)
+      end,
+    })
+
+    return vim.lsp.rpc.start({ paths.nimlangserver }, wrapped_dispatchers, {
+      env = {
+        PATH = paths.path,
+      },
+    })
+  end
+
   vim.lsp.config('nim_langserver', {
     capabilities = get_nim_capabilities(),
-    cmd = {
-      'env',
-      'PATH=' .. paths.path,
-      paths.nimlangserver,
-    },
+    cmd = start_nimlangserver,
     filetypes = vim.deepcopy(nim_filetypes),
     root_markers = { '*.nimble', '.git' },
     settings = {
@@ -366,20 +379,26 @@ local function setup_nim_attach()
         return
       end
 
-      setup_nim_signature_help(bufnr, client)
+      vim.schedule(function()
+        if not vim.api.nvim_buf_is_valid(bufnr) then
+          return
+        end
 
-      vim.keymap.set('n', 'gd', vim.lsp.buf.definition, { buffer = bufnr, desc = 'Nim: Goto Definition' })
-      vim.keymap.set('n', 'gr', vim.lsp.buf.references, { buffer = bufnr, desc = 'Nim: Goto References' })
-      vim.keymap.set('n', 'gI', vim.lsp.buf.implementation, { buffer = bufnr, desc = 'Nim: Goto Implementation' })
-      vim.keymap.set('n', '<leader>D', vim.lsp.buf.type_definition, { buffer = bufnr, desc = 'Nim: Type Definition' })
-      vim.keymap.set('n', '<leader>nb', '<cmd>NimBuild<cr>', { buffer = bufnr, desc = 'Nim: Build' })
-      vim.keymap.set('n', '<leader>nr', '<cmd>NimRun<cr>', { buffer = bufnr, desc = 'Nim: Run' })
-      vim.keymap.set('n', '<leader>nc', '<cmd>NimCheck<cr>', { buffer = bufnr, desc = 'Nim: Check' })
-      vim.keymap.set('n', '<leader>nt', '<cmd>NimTest<cr>', { buffer = bufnr, desc = 'Nim: Test' })
+        setup_nim_signature_help(bufnr, client)
 
-      if client.server_capabilities.inlayHintProvider then
-        vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
-      end
+        vim.keymap.set('n', 'gd', vim.lsp.buf.definition, { buffer = bufnr, desc = 'Nim: Goto Definition' })
+        vim.keymap.set('n', 'gr', vim.lsp.buf.references, { buffer = bufnr, desc = 'Nim: Goto References' })
+        vim.keymap.set('n', 'gI', vim.lsp.buf.implementation, { buffer = bufnr, desc = 'Nim: Goto Implementation' })
+        vim.keymap.set('n', '<leader>D', vim.lsp.buf.type_definition, { buffer = bufnr, desc = 'Nim: Type Definition' })
+        vim.keymap.set('n', '<leader>nb', '<cmd>NimBuild<cr>', { buffer = bufnr, desc = 'Nim: Build' })
+        vim.keymap.set('n', '<leader>nr', '<cmd>NimRun<cr>', { buffer = bufnr, desc = 'Nim: Run' })
+        vim.keymap.set('n', '<leader>nc', '<cmd>NimCheck<cr>', { buffer = bufnr, desc = 'Nim: Check' })
+        vim.keymap.set('n', '<leader>nt', '<cmd>NimTest<cr>', { buffer = bufnr, desc = 'Nim: Test' })
+
+        if client.server_capabilities.inlayHintProvider then
+          vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
+        end
+      end)
     end,
   })
 end

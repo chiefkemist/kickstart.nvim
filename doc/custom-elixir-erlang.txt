@@ -1,0 +1,152 @@
+*custom-elixir-erlang.txt*  Elixir and Erlang tooling for this Neovim config
+
+Elixir Tooling                                        *custom-elixir-tooling*
+
+This config uses the official Elixir Expert language server through Neovim's
+built-in LSP client.
+
+The Elixir REPL workflow is implemented in:
+  `lua/custom/plugins/elixir.lua`
+
+Expert is enabled through Neovim's native LSP support. Tree-sitter parsers are
+ensured for:
+  `elixir`, `eex`, `heex`, `markdown`, `markdown_inline`
+
+Livebook / .livemd Highlighting                      *custom-livebook-highlighting*
+
+Neovim already recognizes `.livemd` files as the `livebook` filetype.
+
+This config maps the `livebook` filetype to Tree-sitter Markdown so Livebook
+notebooks get structured Markdown highlighting, including fenced Elixir code
+blocks via Markdown injections.
+
+This provides syntax highlighting for Livebook documents without adding a
+separate Livebook plugin.
+
+Elixir REPL Modes                                     *custom-elixir-repl-modes*
+
+This config supports multiple explicit IEx modes.
+
+Default mode:
+        `:ElixirReplOpen`
+        Opens the default REPL for the current project.
+        - If `mix.exs` exists, this defaults to `iex -S mix`.
+        - Otherwise it defaults to plain `iex`.
+
+Plain mode:
+        `:ElixirReplOpenPlain`
+        Opens plain `iex`.
+
+Mix mode:
+        `:ElixirReplOpenMix`
+        Opens `iex -S mix`.
+        This requires a Mix project.
+
+Phoenix mode:
+        `:ElixirReplOpenPhoenix`
+        Opens `iex -S mix phx.server`.
+        This is intended for Phoenix projects.
+
+The current project remembers the most recently opened REPL mode, and eval
+commands send code to that active REPL mode.
+
+Elixir REPL Commands                                 *custom-elixir-commands*
+
+These commands use a real `iex` terminal split.
+
+:ElixirReplOpen                                    *:ElixirReplOpen*
+        Open or focus the default Elixir REPL for the current project.
+
+:ElixirReplOpenPlain                               *:ElixirReplOpenPlain*
+        Open or focus plain `iex`.
+
+:ElixirReplOpenMix                                 *:ElixirReplOpenMix*
+        Open or focus `iex -S mix`.
+
+:ElixirReplOpenPhoenix                             *:ElixirReplOpenPhoenix*
+        Open or focus `iex -S mix phx.server`.
+
+:ElixirReplEvalLine                                *:ElixirReplEvalLine*
+        Evaluate the current line in the active Elixir REPL.
+
+:ElixirReplEvalSelection                           *:ElixirReplEvalSelection*
+        Evaluate the current visual selection in the active Elixir REPL.
+
+:ElixirReplEvalBuffer                              *:ElixirReplEvalBuffer*
+        Evaluate the current buffer in the active Elixir REPL.
+
+:ElixirReplClearInline                             *:ElixirReplClearInline*
+        Clear inline evaluation result text from the current buffer.
+
+Elixir Keymaps                                       *custom-elixir-keymaps*
+
+These keymaps are buffer-local and only apply to Elixir-related filetypes:
+  `elixir`, `eelixir`, `heex`, `surface`
+
+        <localleader>ro    Open default REPL
+        <localleader>ri    Open plain IEx
+        <localleader>rm    Open IEx -S mix
+        <localleader>rp    Open IEx -S mix phx.server
+        <localleader>rl    Evaluate current line
+        <localleader>re    Evaluate visual selection
+        <localleader>rb    Evaluate current buffer
+        <localleader>rc    Clear inline eval result
+
+In this config `<localleader>` is `<Space>`.
+
+Elixir Hover and Type Info                           *custom-elixir-hover*
+
+When Expert attaches, this config shows compact hover/type information in the
+command area while moving or holding over symbols, similar to the Nim setup.
+
+Expert also provides diagnostics, hover, completion, and standard LSP features.
+
+Elixir Inlay Hints                                   *custom-elixir-inlay*
+
+This config enables Elixir inlay hints automatically if Expert advertises an
+inlay-hint provider.
+
+At the time this help was written, Expert hover works, but inlay hints may not
+be available yet depending on the server build being used.
+
+Erlang Tooling                                       *custom-erlang-tooling*
+
+This config uses the official Erlang Language Platform (ELP) through Neovim's
+built-in LSP client.
+
+The Erlang setup is implemented in:
+  `lua/custom/plugins/erlang.lua`
+
+Tree-sitter parsers are ensured for:
+  `erlang`
+
+Erlang Hover and Type Info                           *custom-erlang-hover*
+
+When ELP attaches, this config shows compact hover/type information in the
+command area while moving or holding over symbols, similar to the Nim setup.
+
+Erlang Inlay Hints                                   *custom-erlang-inlay*
+
+If ELP provides inlay hints, this config enables them automatically for Erlang
+buffers.
+
+Telescope Help                                       *custom-elixir-erlang-telescope*
+
+This help file is available through Neovim help tags and can be searched with
+Telescope:
+
+        :Telescope help_tags
+
+Useful tags to search for:
+
+        custom-elixir-tooling
+        custom-livebook-highlighting
+        custom-elixir-repl-modes
+        custom-elixir-commands
+        custom-elixir-keymaps
+        custom-elixir-hover
+        custom-elixir-inlay
+        custom-erlang-tooling
+        custom-erlang-hover
+        custom-erlang-inlay
+        custom-elixir-erlang.txt

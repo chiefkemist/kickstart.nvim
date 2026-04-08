@@ -1,36 +1,36 @@
 return {
   {
-    {
-      'elixir-tools/elixir-tools.nvim',
-      version = '*',
-      event = { 'BufReadPre', 'BufNewFile' },
-      config = function()
-        local elixir = require 'elixir'
-        local elixirls = require 'elixir.elixirls'
-
-        elixir.setup {
-          nextls = { enable = true },
-          elixirls = {
-            enable = true,
-            settings = elixirls.settings {
-              dialyzerEnabled = false,
-              enableTestLenses = false,
-            },
-            on_attach = function(client, bufnr)
-              vim.keymap.set('n', '<space>fp', ':ElixirFromPipe<cr>', { buffer = true, noremap = true })
-              vim.keymap.set('n', '<space>tp', ':ElixirToPipe<cr>', { buffer = true, noremap = true })
-              vim.keymap.set('v', '<space>em', ':ElixirExpandMacro<cr>', { buffer = true, noremap = true })
-            end,
-          },
-          projectionist = {
-            enable = true,
-          },
-        }
-      end,
-      dependencies = {
-        'nvim-lua/plenary.nvim',
-      },
-    },
+    -- {
+    --   'elixir-tools/elixir-tools.nvim',
+    --   version = '*',
+    --   event = { 'BufReadPre', 'BufNewFile' },
+    --   config = function()
+    --     local elixir = require 'elixir'
+    --     local elixirls = require 'elixir.elixirls'
+    --
+    --     elixir.setup {
+    --       nextls = { enable = true },
+    --       elixirls = {
+    --         enable = true,
+    --         settings = elixirls.settings {
+    --           dialyzerEnabled = false,
+    --           enableTestLenses = false,
+    --         },
+    --         on_attach = function(client, bufnr)
+    --           vim.keymap.set('n', '<space>fp', ':ElixirFromPipe<cr>', { buffer = true, noremap = true })
+    --           vim.keymap.set('n', '<space>tp', ':ElixirToPipe<cr>', { buffer = true, noremap = true })
+    --           vim.keymap.set('v', '<space>em', ':ElixirExpandMacro<cr>', { buffer = true, noremap = true })
+    --         end,
+    --       },
+    --       projectionist = {
+    --         enable = true,
+    --       },
+    --     }
+    --   end,
+    --   dependencies = {
+    --     'nvim-lua/plenary.nvim',
+    --   },
+    -- },
     {
       'kovisoft/slimv', -- Lisp
     },
@@ -122,11 +122,21 @@ return {
           pattern = 'mojo',
           callback = function()
             local modular = vim.env.MODULAR_HOME
-            local lsp_cmd = modular .. '/pkg/packages.modular.com_mojo/bin/mojo-lsp-server'
 
             vim.bo.expandtab = true
             vim.bo.shiftwidth = 4
             vim.bo.softtabstop = 4
+
+            if not modular or modular == '' then
+              vim.notify('MODULAR_HOME is not set; skipping mojo-lsp-server startup', vim.log.levels.WARN)
+              return
+            end
+
+            local lsp_cmd = modular .. '/pkg/packages.modular.com_mojo/bin/mojo-lsp-server'
+            if vim.fn.executable(lsp_cmd) ~= 1 then
+              vim.notify('mojo-lsp-server not found at ' .. lsp_cmd, vim.log.levels.WARN)
+              return
+            end
 
             vim.lsp.start {
               name = 'mojo',
