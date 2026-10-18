@@ -75,25 +75,17 @@ return {
     -- },
     {
       'mrcjkb/rustaceanvim', -- Rust
-      version = '^4',
-      ft = { 'rust' },
+      version = '^9', -- Requires Neovim 0.12+
+      lazy = false, -- rustaceanvim handles its own filetype loading
       init = function()
-        vim.g.rustfmt_autosave = 1
         vim.g.rustaceanvim = {
-          tools = {
-            autoSetHints = true,
-            hoverWithButtons = true,
-            inlayHints = {
-              chainingHints = true,
-              typeHints = true,
-              parameterHints = true,
-            },
-            runnables = {
-              useCargo = true,
-            },
-            debuggables = {
-              useLLDB = true,
-            },
+          server = {
+            on_attach = function(_, bufnr)
+              vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
+              vim.keymap.set('n', 'K', function()
+                vim.cmd.RustLsp { 'hover', 'actions' }
+              end, { buffer = bufnr, desc = 'Rust hover actions' })
+            end,
           },
         }
       end,

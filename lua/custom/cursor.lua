@@ -664,18 +664,6 @@ vim.schedule(function()
   end
 end)
 
--- AI workflows from ECA/opencode, using the installed Codex extension in Cursor.
-map({ 'n', 'x' }, '<C-a>', 'chatgpt.addToThread', 'Add current context to Codex')
-map({ 'n', 'x' }, '<C-x>', 'chatgpt.openCommandMenu', 'Open Codex actions')
-map({ 'n', 'x' }, 'ga', 'chatgpt.addToThread', 'Add to Codex')
-map('n', '<C-.>', 'chatgpt.openSidebar', 'Toggle Codex')
-map('n', '<leader>ec', 'chatgpt.newChat', 'New Codex chat')
-map('n', '<leader>ed', 'chatgpt.openCommandMenu', 'Add directory/context to Codex')
-map('n', '<leader>ef', 'chatgpt.addFileToThread', 'Add file to Codex')
-map('n', '<leader>er', 'chatgpt.newChat', 'Restart Codex session')
-map('n', '<leader>et', 'chatgpt.openSidebar', 'Show Codex status')
-map('x', '<leader>es', 'chatgpt.addToThread', 'Add selection to Codex')
-
 -- Debugging.
 map('n', '<F5>', 'workbench.action.debug.start', 'Debug: Start/Continue')
 map('n', '<F1>', 'workbench.action.debug.stepInto', 'Debug: Step Into')

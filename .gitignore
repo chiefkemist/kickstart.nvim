@@ -1,7 +1,21 @@
+# Generated help/search tags and local tooling
 tags
 test.sh
 .luarc.json
-nvim
+/nvim
+/spell/
+/.expert/
 
-spell/
-lazy-lock.json
+# Editor state, backups, and temporary files
+.DS_Store
+.netrwhist
+Session.vim
+Session.vim*
+*.swp
+*.swo
+*~
+*.bak
+*.tmp
+*.log
+/tmp/
+/.cache/

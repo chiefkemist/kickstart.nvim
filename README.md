@@ -84,6 +84,36 @@ nvim
 That's it! Lazy will install all the plugins you have. Use `:Lazy` to view
 current plugin status.
 
+### pi assistant
+
+Install the [pi CLI](https://pi.dev) and configure its provider/model and authentication
+before using [pi.nvim](https://github.com/pablopunk/pi.nvim). The plugin uses your
+existing CLI defaults; no credentials are stored in this repository.
+
+- `<leader>ai`: ask pi about the current buffer (or visual selection)
+- `<leader>ac`: cancel the active request
+- `<leader>al`: open the pi log
+- `<leader>ar` / `:PiResponse`: reopen the last response
+- `:PiToggleSession`: toggle session persistence (off by default)
+
+Replies stream into a persistent Markdown pane; press `q` there to close it.
+`lua/custom/pi.lua` adapts upstream pi.nvim's transport for Pi CLI 1.3+:
+assistant text is displayed/logged, provider errors are surfaced, and completion
+waits for `agent_settled` rather than stopping before automatic retries finish.
+Extension dialogs are cancelled with a notice; use the CLI for those interactions.
+
+Regression tests (Python 3 required, no model calls):
+`nvim --headless '+luafile tests/pi.lua'`.
+
+### Dependency updates
+
+This setup requires Neovim 0.12+ (including rustaceanvim 9).
+Run `:Lazy sync` to update plugins, `:MasonToolsUpdate` to update configured
+language servers/tools, and `:TSUpdate` to update installed Treesitter parsers.
+Commit `lazy-lock.json` after plugin updates so other installations can reproduce
+the same versions with `:Lazy restore`. Local help tags (`doc/tags`) are generated
+at startup and should not be committed.
+
 Read through the `init.lua` file in your configuration folder for more
 information about extending and exploring Neovim.
 

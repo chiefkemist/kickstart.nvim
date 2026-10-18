@@ -1,7 +1,7 @@
 return {
   -- Roslyn LSP for C# with Razor support
   {
-    'seblj/roslyn.nvim',
+    'seblyng/roslyn.nvim',
     ft = { 'cs', 'csproj', 'sln', 'razor', 'cshtml' },
   },
 
@@ -15,9 +15,12 @@ return {
         filetypes = { 'html', 'razor', 'cshtml' },
       })
 
-      vim.lsp.config('html', vim.tbl_deep_extend('force', vim.deepcopy(vim.lsp.config.html or {}), {
-        filetypes = { 'html', 'razor', 'cshtml' },
-      }))
+      vim.lsp.config(
+        'html',
+        vim.tbl_deep_extend('force', vim.deepcopy(vim.lsp.config.html or {}), {
+          filetypes = { 'html', 'razor', 'cshtml' },
+        })
+      )
 
       return opts
     end,
@@ -31,12 +34,6 @@ return {
       opts.formatters_by_ft = opts.formatters_by_ft or {}
       opts.formatters_by_ft.cs = { 'csharpier' }
       opts.formatters_by_ft.razor = { 'csharpier' }
-
-      opts.formatters = opts.formatters or {}
-      opts.formatters.csharpier = {
-        command = 'csharpier',
-        args = { '--write-stdout' },
-      }
 
       return opts
     end,
@@ -65,12 +62,13 @@ return {
     end,
   },
 
-  -- Ensure Mason installs required packages
+  -- Tool installation is handled by mason-tool-installer, not mason.nvim.
   {
-    'williamboman/mason.nvim',
+    'neovim/nvim-lspconfig',
+    optional = true,
     opts = function(_, opts)
       opts.ensure_installed = opts.ensure_installed or {}
-      vim.list_extend(opts.ensure_installed, { 'roslyn', 'rzls', 'html-lsp', 'csharpier' })
+      vim.list_extend(opts.ensure_installed, { 'roslyn', 'html-lsp', 'csharpier' })
       return opts
     end,
   },

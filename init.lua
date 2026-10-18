@@ -286,6 +286,7 @@ require('lazy').setup({
 
       -- Document existing key chains
       require('which-key').add {
+        { '<leader>a', group = '[A]I (pi)' },
         { '<leader>c', group = '[C]ode' },
         { '<leader>d', group = '[D]ocument' },
         { '<leader>r', group = '[R]ename' },
@@ -403,8 +404,24 @@ require('lazy').setup({
     'neovim/nvim-lspconfig',
     dependencies = {
       -- Automatically install LSPs and related tools to stdpath for neovim
-      'williamboman/mason.nvim',
-      'williamboman/mason-lspconfig.nvim',
+      {
+        'mason-org/mason.nvim',
+        opts = {
+          registries = {
+            'github:mason-org/mason-registry',
+            'github:Crashdummyy/mason-registry', -- Roslyn LSP
+          },
+        },
+      },
+      {
+        'mason-org/mason-lspconfig.nvim',
+        opts = {
+          -- These servers are configured by custom modules or rustaceanvim.
+          automatic_enable = {
+            exclude = { 'csharp_ls', 'omnisharp', 'nim_langserver', 'rust_analyzer', 'elixirls', 'erlangls' },
+          },
+        },
+      },
       'WhoIsSethDaniel/mason-tool-installer.nvim',
 
       -- Useful status updates for LSP.
@@ -585,38 +602,22 @@ require('lazy').setup({
       --    :Mason
       --
       --  You can press `g?` for help in this menu
-      require('mason').setup {
-        registries = {
-          'github:mason-org/mason-registry',
-          'github:Crashdummyy/mason-registry', -- For roslyn LSP
-        },
-      }
-
       -- You can add other tools here that you want Mason to install
       -- for you, so that they are available from within Neovim.
       local ensure_installed = vim.tbl_keys(servers or {})
       vim.list_extend(ensure_installed, opts.ensure_installed or {})
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
-      require('mason-lspconfig').setup {
-        handlers = {
-          function(server_name)
-            -- Skip csharp_ls and omnisharp since we use roslyn.nvim instead.
-            -- Skip nim_langserver too; it is configured separately below so we can
-            -- control its PATH and nimsuggest lookup explicitly.
-            if server_name == 'csharp_ls' or server_name == 'omnisharp' or server_name == 'nim_langserver' then
-              return
-            end
-
-            local server = servers[server_name] or {}
-            -- This handles overriding only values explicitly passed
-            -- by the server configuration above. Useful when disabling
-            -- certain features of an LSP (for example, turning off formatting for tsserver)
-            server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
-            require('lspconfig')[server_name].setup(server)
-          end,
-        },
-      }
+      -- mason-lspconfig v2 uses vim.lsp.enable instead of setup handlers.
+      -- Configure explicit overrides with Neovim's native LSP API.
+      for server_name, server in pairs(servers) do
+        if server_name ~= 'nim_langserver' and server_name ~= 'rust_analyzer' then
+          server = vim.deepcopy(server)
+          server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
+          vim.lsp.config(server_name, server)
+          vim.lsp.enable(server_name)
+        end
+      end
 
       -- Disable csharp_ls and omnisharp (we use roslyn.nvim instead)
       -- This prevents Mason-installed servers from auto-starting
@@ -694,12 +695,20 @@ require('lazy').setup({
 
       local ocamllsp_cmd = find_ocamllsp_cmd()
       if ocamllsp_cmd then
-        require('lspconfig').ocamllsp.setup {
+        vim.lsp.config('ocamllsp', {
           cmd = ocamllsp_cmd,
           filetypes = { 'ocaml', 'menhir', 'ocamlinterface', 'ocamllex', 'reason', 'dune' },
-          root_dir = require('lspconfig.util').root_pattern('dune-project', 'dune-workspace', '*.opam', 'opam', 'esy.json', 'package.json', '.git'),
+          root_dir = function(bufnr, on_dir)
+            local root = require('lspconfig.util').root_pattern('dune-project', 'dune-workspace', '*.opam', 'opam', 'esy.json', 'package.json', '.git')(
+              vim.api.nvim_buf_get_name(bufnr)
+            )
+            if root then
+              on_dir(root)
+            end
+          end,
           capabilities = capabilities,
-        }
+        })
+        vim.lsp.enable 'ocamllsp'
       end
     end,
   },
@@ -710,7 +719,7 @@ require('lazy').setup({
       notify_on_error = false,
       format_on_save = {
         timeout_ms = 500,
-        lsp_fallback = true,
+        lsp_format = 'fallback',
       },
       formatters_by_ft = {
         lua = { 'stylua' },
@@ -841,7 +850,7 @@ require('lazy').setup({
   { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
 
   { -- Collection of various small independent plugins/modules
-    'echasnovski/mini.nvim',
+    'nvim-mini/mini.nvim',
     config = function()
       -- Better Around/Inside textobjects
       --
@@ -874,7 +883,7 @@ require('lazy').setup({
       end
 
       -- ... and there is more!
-      --  Check out: https://github.com/echasnovski/mini.nvim
+      --  Check out: https://github.com/nvim-mini/mini.nvim
       require('mini.animate').setup()
     end,
   },

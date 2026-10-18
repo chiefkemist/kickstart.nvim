@@ -171,7 +171,7 @@ end
 
 return {
   {
-    'williamboman/mason-lspconfig.nvim',
+    'mason-org/mason-lspconfig.nvim',
     optional = true,
     opts = function(_, opts)
       local exclude = { elixirls = true, erlangls = true }
